@@ -1,0 +1,27 @@
+// Import Page Partials From layouts
+import Header from "../layouts/Header";
+import Nav from "../layouts/Nav";
+import Sidebar from "../layouts/Sidebar";
+import Footer from "../layouts/Footer";
+// Import Components
+import Welcome from "../components/Welcome";
+
+function GalleryPage() {
+  return (
+    <div className="app-shell">
+      <Header />
+      <Nav />
+      <main className="app-main">
+        <Welcome
+          title="Gallery Page"
+          description="Content for Gallery page with a camera symbol in the title."
+          icon="📷"
+        />
+        <Sidebar />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default GalleryPage();

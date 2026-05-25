@@ -1,0 +1,213 @@
+@layer reset, theme, layout, components;
+
+@layer reset {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    margin: 0;
+  }
+
+  body {
+    font-family: "Manrope", "Segoe UI", sans-serif;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer theme {
+  :root {
+    color-scheme: dark;
+
+    --bg: radial-gradient(
+      circle at 15% 15%,
+      oklch(0.54 0.2 262) 0%,
+      oklch(0.25 0.04 262) 45%,
+      oklch(0.14 0.02 262) 100%
+    );
+    --surface: oklch(0.22 0.03 255 / 0.78);
+    --outline: oklch(0.96 0.01 255 / 0.18);
+    --text: oklch(0.93 0.02 245);
+
+    --header: linear-gradient(
+      130deg,
+      oklch(0.58 0.19 258),
+      oklch(0.7 0.14 230)
+    );
+    --nav: linear-gradient(130deg, oklch(0.52 0.11 193), oklch(0.74 0.12 185));
+    --main: linear-gradient(130deg, oklch(0.43 0.12 150), oklch(0.73 0.19 146));
+    --aside: linear-gradient(130deg, oklch(0.54 0.13 65), oklch(0.82 0.15 82));
+    --footer: linear-gradient(130deg, oklch(0.46 0.12 50), oklch(0.72 0.18 55));
+
+    --radius: 18px;
+    --gap: 14px;
+  }
+}
+
+@layer layout {
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    color: var(--text);
+  }
+
+  #root {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .app-shell {
+    width: min(100%, 1120px);
+    min-height: 100vh;
+    margin: auto;
+    padding: calc(var(--gap) + 4px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+
+  .app-main {
+    flex: 1;
+    display: flex;
+    gap: var(--gap);
+  }
+
+  .app-content {
+    flex: 1;
+  }
+
+  .app-sidebar {
+    flex: 0 0 280px;
+  }
+}
+
+@layer components {
+  .app-shell {
+    background: var(--surface);
+    border: 1px solid var(--outline);
+    border-radius: calc(var(--radius) + 2px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 22px 52px oklch(0 0 0 / 0.45);
+  }
+
+  .app-header,
+  .app-nav,
+  .app-content,
+  .app-sidebar,
+  .app-footer {
+    border-radius: var(--radius);
+    min-height: 72px;
+    padding: 18px 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    border: 1px solid oklch(0.98 0.01 255 / 0.16);
+    box-shadow:
+      inset 0 1px 0 oklch(0.98 0.01 255 / 0.16),
+      0 10px 26px oklch(0 0 0 / 0.2);
+  }
+
+  .app-header {
+    background: var(--header);
+  }
+
+  .app-nav {
+    background: var(--nav);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: oklch(1 0 0 / 0.16);
+    border: 1px solid oklch(1 0 0 / 0.2);
+    transition:
+      background-color 160ms ease,
+      transform 160ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    background: oklch(1 0 0 / 0.28);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .nav-link.active {
+    background: oklch(1 0 0 / 0.34);
+  }
+
+  .app-content {
+    background: var(--main);
+    display: block;
+  }
+
+  .page-title {
+    margin: 0;
+    font-size: clamp(1.35rem, 2vw, 1.9rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .page-icon {
+    font-size: 1.35em;
+    line-height: 1;
+  }
+
+  .page-copy {
+    margin: 12px 0 0;
+    font-size: 1rem;
+    font-weight: 500;
+    max-width: 60ch;
+    opacity: 0.95;
+  }
+
+  .app-sidebar {
+    background: var(--aside);
+  }
+
+  .app-footer {
+    background: var(--footer);
+  }
+
+  .app-content,
+  .app-sidebar {
+    min-height: 360px;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  @layer layout {
+    .app-shell {
+      padding: var(--gap);
+    }
+
+    .app-main {
+      flex-direction: column;
+    }
+
+    .app-sidebar {
+      flex-basis: 160px;
+    }
+  }
+}
