@@ -1,4 +1,4 @@
-@layer reset, theme, layout, components;
+@layer reset, theme, layout, components, main, component;
 
 @layer reset {
   * {
@@ -48,6 +48,55 @@
 
     --radius: 18px;
     --gap: 14px;
+
+    /* Product Card MD Variables */
+    --md-surface: oklch(0.22 0.03 255);
+    --md-surface-1: oklch(0.25 0.04 262);
+    --md-surface-variant: oklch(1 0 0 / 0.05);
+    --md-on-surface: var(--text);
+    --md-on-surface-variant: oklch(0.93 0.02 245 / 0.8);
+    --md-outline: var(--outline);
+    --md-outline-variant: oklch(0.96 0.01 255 / 0.12);
+    --md-primary: oklch(0.58 0.19 258);
+    --md-primary-dark: oklch(0.48 0.19 258);
+    --md-on-primary: oklch(1 0 0);
+    --md-primary-container: oklch(0.58 0.19 258 / 0.2);
+    --md-on-primary-container: oklch(0.7 0.14 230);
+    --md-secondary-container: oklch(0.52 0.11 193 / 0.2);
+    --md-on-secondary-container: oklch(0.74 0.12 185);
+    --md-success-container: oklch(0.65 0.2 145 / 0.2);
+    --md-on-success-container: oklch(0.73 0.19 146);
+    --md-error: oklch(0.6 0.18 25);
+    --md-error-container: oklch(0.6 0.18 25 / 0.2);
+    --md-on-error-container: oklch(0.72 0.18 55);
+    --md-shadow: oklch(0 0 0 / 0.5);
+
+    /* Main Layer Variables */
+    --md-background: var(--bg);
+    --md-on-background: var(--text);
+    --max-width-2xl: 1440px;
+
+    --font-size-2xl: 24px;
+    --font-size-xl: 20px;
+    --font-size-md: 16px;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+
+    --radius-lg: 18px;
+    --radius-sm: 8px;
+    --radius-full: 999px;
+
+    --space-2xl: 48px;
+    --space-lg: 24px;
+    --space-md: 16px;
+    --space-sm: 12px;
+    --space-xs: 8px;
+    --space-2xs: 4px;
+
+    --font-sans: "Manrope", sans-serif;
+    --duration-normal: 250ms;
+    --duration-fast: 150ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   }
 }
 
@@ -209,5 +258,592 @@
     .app-sidebar {
       flex-basis: 160px;
     }
+  }
+}
+
+@layer component {
+  @scope (.product-card) {
+    /* ============================================================
+       CARD SHELL
+       The outermost element — the white box you see on screen.
+       :scope refers to the .product-card element itself (the scope
+       root). Think of it as "style me, the container".
+       ============================================================ */
+
+    :scope {
+      /* Enables container queries for children — lets inner elements
+         respond to THIS card's width instead of the viewport width. */
+      container-type: inline-size;
+      container-name: product-card; /* name used in @container rules below */
+
+      background: var(--md-surface); /* card background colour */
+      border: 1px solid var(--md-outline-variant); /* subtle border */
+      border-radius: var(--radius-lg); /* rounded corners */
+      overflow: hidden; /* clips children (e.g. image) to the rounded corners */
+      font-family: var(--font-sans);
+
+      /* Smoothly animates the shadow when hovering */
+      transition: box-shadow var(--duration-normal) var(--ease-standard);
+    }
+
+    /* Lift the card with a soft shadow when the user hovers over it */
+    :scope:hover {
+      box-shadow: 0 4px 20px var(--md-shadow);
+    }
+
+    /* ============================================================
+       LAYOUT — INNER WRAPPER
+       Stacks media panel and content panel vertically by default.
+       Switches to side-by-side (row) on wider cards.
+       ============================================================ */
+
+    .component-inner {
+      display: flex;
+      flex-direction: column; /* mobile-first: image on top, text below */
+    }
+
+    /*
+      @container checks the width of .product-card (not the viewport).
+      When the card is at least 540px wide, switch to a horizontal layout.
+    */
+    @container product-card (min-width: 540px) {
+      .component-inner {
+        flex-direction: row; /* image left, content right */
+      }
+
+      /* Fix the media panel to a set width so it doesn't stretch */
+      .component-head {
+        width: 280px;
+        flex-shrink: 0; /* prevents it from shrinking below 280px */
+      }
+
+      /* Content panel takes up all remaining space */
+      .component-body {
+        flex: 1;
+        min-width: 0; /* prevents text overflow bugs in flex children */
+      }
+    }
+
+    /* On even wider cards, give the image panel a bit more room */
+    @container product-card (min-width: 700px) {
+      .component-head {
+        width: 320px;
+      }
+    }
+
+    /* ============================================================
+       MEDIA PANEL (left/top side)
+       Contains the main product image, badges, and thumbnail row.
+       ============================================================ */
+
+    .component-head {
+      position: relative; /* needed so absolutely-positioned badges
+                             stay anchored inside this panel */
+      background: var(
+        --md-surface-1
+      ); /* slightly different shade from card bg */
+    }
+
+    /* Flex column so the thumbnail row sticks to the bottom
+       while the main image fills the remaining height */
+    .product-media {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Centred image area — grows to fill available space */
+    .product-thumbnail {
+      flex: 1; /* takes up all space not used by the gallery strip */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
+      min-height: 200px; /* ensures a minimum visible area even with no image */
+    }
+
+    .product-thumbnail img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain; /* scales image to fit without cropping or stretching */
+      display: block; /* removes the default inline whitespace gap below images */
+    }
+
+    /* ============================================================
+       BADGES
+       Small pill labels (e.g. "New", "Sale") overlaid on the image.
+       position: absolute places them on top of .component-head.
+       ============================================================ */
+
+    .product-badges {
+      position: absolute; /* floats over the image */
+      top: var(--space-sm);
+      left: var(--space-sm);
+      display: flex;
+      flex-wrap: wrap; /* wraps to a new line if there are many badges */
+      gap: var(--space-2xs);
+      z-index: 2; /* sits above the image layer */
+    }
+
+    /* Shared styles for all badge variants */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: var(--radius-full); /* pill shape */
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Each variant just swaps the colour pair (background + text) */
+    .badge-new {
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+    }
+    .badge-gift {
+      background: var(--md-success-container);
+      color: var(--md-on-success-container);
+    }
+    .badge-discount {
+      background: var(--md-error-container);
+      color: var(--md-on-error-container);
+    }
+
+    /* ============================================================
+       THUMBNAIL GALLERY
+       A horizontally scrollable row of small preview images
+       at the bottom of the media panel.
+       ============================================================ */
+
+    .product-gallery {
+      display: flex;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      border-top: 1px solid var(--md-outline-variant);
+      overflow-x: auto; /* scroll horizontally if thumbs overflow */
+      scrollbar-width: none; /* hide scrollbar in Firefox */
+    }
+
+    /* Hide scrollbar in Chrome/Safari — gallery still scrolls via touch/drag */
+    .product-gallery::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gallery-thumb {
+      flex-shrink: 0; /* prevents thumbs from squishing when space is tight */
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--md-outline-variant);
+      background: var(--md-surface);
+      cursor: pointer;
+      padding: 4px;
+      overflow: hidden;
+      transition: border-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Highlight the active thumb or the one being hovered */
+    .gallery-thumb:hover,
+    .gallery-thumb.active {
+      border-color: var(--md-primary);
+    }
+
+    /* ============================================================
+       CONTENT PANEL (right/bottom side)
+       Holds all the text, pricing, and action buttons.
+       ============================================================ */
+
+    .component-body {
+      display: flex;
+      flex-direction: column; /* stacks all content sections vertically */
+    }
+
+    /* Inner padding wrapper — adds breathing room around the text */
+    .component-holder {
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm); /* space between each content section */
+      flex: 1; /* stretches to fill the full height of .component-body */
+    }
+
+    /* More generous padding and gap on wider cards */
+    @container product-card (min-width: 540px) {
+      .component-holder {
+        padding: var(--space-lg);
+        gap: var(--space-md);
+      }
+    }
+
+    /* ============================================================
+       META ROW
+       Small pill labels showing category, brand, and model number.
+       ============================================================ */
+
+    .product-meta {
+      display: flex;
+      flex-wrap: wrap; /* wraps to next line on narrow cards */
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Shared base styles for all three meta pills */
+    .product-category,
+    .product-brand,
+    .product-model {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius-full); /* pill shape */
+    }
+
+    .product-category {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+    }
+    .product-brand {
+      background: var(--md-surface-variant);
+      color: var(--md-on-surface-variant);
+    }
+    .product-model {
+      color: var(--md-on-surface-variant);
+      font-size: 11px;
+    } /* plain text, no background */
+
+    /* ============================================================
+       TITLE + RATING
+       Title sits on the left, rating badge on the right.
+       justify-content: space-between pushes them to opposite ends.
+       ============================================================ */
+
+    .product-header {
+      display: flex;
+      align-items: flex-start; /* align to the top in case title wraps */
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      line-height: 1.35;
+      flex: 1; /* title grows to fill space, pushing the rating badge right */
+    }
+
+    /* Small "4.8 / 5" pill in the top-right of the content area */
+    .product-rating {
+      display: flex;
+      align-items: baseline; /* aligns "4.8" and "/5" on the same text baseline */
+      gap: 2px;
+      flex-shrink: 0; /* rating never shrinks — title shrinks instead */
+      background: var(--md-primary-container);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .rating-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--md-on-primary-container);
+    }
+    .rating-max {
+      font-size: 11px;
+      color: var(--md-on-primary-container);
+      opacity: 0.7;
+    } /* "/5" is dimmer */
+
+    /* ============================================================
+       DESCRIPTION
+       Clamps the text to 3 lines with a "..." truncation.
+       The -webkit-box trick is the standard cross-browser way to do
+       multi-line text clamping in CSS.
+       ============================================================ */
+
+    .product-description p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--md-on-surface-variant);
+
+      /* Multi-line clamp — shows max 3 lines then adds "…" */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       TAGS
+       Keyword chips (e.g. "Wireless", "USB-C") below the description.
+       ============================================================ */
+
+    .product-tags {
+      display: flex;
+      flex-wrap: wrap; /* wraps to next line when there are many tags */
+      gap: var(--space-2xs);
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--md-outline-variant); /* outlined style, no fill */
+      color: var(--md-on-surface-variant);
+      cursor: default; /* shows normal arrow cursor — tags aren't clickable here */
+      transition: background var(--duration-fast);
+    }
+
+    /* Subtle fill on hover so tags feel interactive */
+    .tag:hover {
+      background: var(--md-surface-variant);
+    }
+
+    /* ============================================================
+       PRICING
+       Sits at the bottom of the content panel.
+       margin-top: auto on the parent (.product-pricing) pushes it
+       down to fill any remaining vertical space above it.
+       ============================================================ */
+
+    .product-pricing {
+      margin-top: auto; /* pushes pricing to the bottom of the flex column */
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--md-outline-variant); /* divider line */
+    }
+
+    /* Price and discount label sit on the same baseline */
+    .price-block {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+    }
+
+    .price-current {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--md-on-surface);
+    }
+
+    /* "Was " pill — uses error colours (red tones) to signal a saving */
+    .price-discount {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--md-error);
+      background: var(--md-error-container);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    /* ============================================================
+       ACTION BUTTONS
+       "Add to cart" (primary) and "Save" (secondary) sit side by side.
+       flex: 1 on each button makes them share the available width equally.
+       ============================================================ */
+
+    .product-actions {
+      display: flex;
+      flex-wrap: wrap; /* stacks buttons vertically on very narrow cards */
+      gap: var(--space-xs);
+    }
+
+    /* Base styles shared by both button variants */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: var(--radius-full); /* pill-shaped buttons */
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: all var(--duration-fast) var(--ease-standard);
+      flex: 1; /* each button grows to fill half the row */
+      min-width: 100px; /* prevents buttons from getting too narrow on small cards */
+    }
+
+    /* Slight scale-down on click for a tactile "press" feel */
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Primary — solid filled, used for the main CTA ("Add to cart") */
+    .btn-primary {
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--md-primary-dark);
+    } /* darkens on hover */
+
+    /* Secondary — transparent with an outline, used for less important actions */
+    .btn-secondary {
+      background: transparent;
+      color: var(--md-primary);
+      border: 1.5px solid var(--md-outline);
+    }
+
+    /* On hover: fills with the primary container colour for a soft highlight */
+    .btn-secondary:hover {
+      background: var(--md-primary-container);
+      border-color: var(--md-primary);
+    }
+  } /* end @scope */
+} /* end @layer component */
+
+@layer main {
+  body {
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-md);
+    color: var(--md-on-background);
+    background: var(--md-background);
+  }
+
+  /* ════════════════════════════════════════
+     SECTION HEADER — .headers block
+     ════════════════════════════════════════ */
+
+  .headers {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+  }
+
+  /* ── Section title: path-style heading ── */
+  .section-title {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+    color: var(--md-on-surface-variant);
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  /* Plain path segments: "Products", "category" */
+  .section-title .title-plain {
+    color: var(--md-on-surface-variant);
+    font-weight: var(--font-weight-regular);
+  }
+
+  /* "/" separator between segments */
+  .section-title .title-sep {
+    color: var(--md-outline);
+    font-weight: var(--font-weight-regular);
+    margin: 0 1px;
+  }
+
+  /* ── Active category — pill treatment ── */
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    padding: 2px 12px 2px 8px;
+    border-radius: var(--radius-full);
+    margin-left: 3px;
+    line-height: 1.4;
+  }
+
+  /* Small dot accent inside the category pill */
+  .category::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-primary);
+    flex-shrink: 0;
+  }
+
+  /* ── Section wrapper ── */
+  .wrapper {
+    min-block-size: 100vh;
+    padding-block: var(--space-2xl);
+    padding-inline: var(--space-md);
+  }
+
+  .wrapper[data-content="products"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Centered container ── */
+  .container {
+    inline-size: min(100%, var(--max-width-2xl));
+    margin-inline: auto;
+  }
+
+  /* ── Flex row ── */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* ── Responsive product grid ── */
+  .row[data-category="beauty"] {
+    --column-count: 2;
+    gap: var(--space-lg);
+
+    @media (width <= 1024px) {
+      --column-count: 1;
+    }
+  }
+
+  .col[data-category="beauty"] {
+    --total-gap-space: calc((var(--column-count) - 1) * var(--space-lg));
+    inline-size: calc((100% - var(--total-gap-space)) / var(--column-count));
+  }
+
+  /* ── Responsive product grid ── */
+  .row[data-category="furniture"] {
+    --column-count: 3;
+    gap: var(--space-lg);
+
+    @media (width <= 1280px) {
+      --column-count: 2;
+    }
+    @media (width <= 768px) {
+      --column-count: 1;
+    }
+  }
+
+  .col[data-category="furniture"] {
+    --total-gap-space: calc((var(--column-count) - 1) * var(--space-lg));
+    inline-size: calc((100% - var(--total-gap-space)) / var(--column-count));
+  }
+
+  /* ── Responsive product grid ── */
+  .row[data-category="laptops"] {
+    --column-count: 2;
+    gap: var(--space-lg);
+    @media (width <= 768px) {
+      --column-count: 1;
+    }
+  }
+
+  .col[data-category="laptops"] {
+    --total-gap-space: calc((var(--column-count) - 1) * var(--space-lg));
+    inline-size: calc((100% - var(--total-gap-space)) / var(--column-count));
   }
 }
